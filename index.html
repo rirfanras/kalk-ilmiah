@@ -1,35 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator</title>
+    <title>Kalkulator Ilmiah Modern</title>
+    <!-- Font -->
+    <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
+    <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+    <link href="[https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap](https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap)" rel="stylesheet">
+    
+    <!-- Menghubungkan CSS Eksternal -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="calc">
-        <input id="display" readonly>
-        <div id="keys">
-            <button onclick="appendToDisplay('/')" class="op-btn">/</button>
-            <button onclick="appendToDisplay('7')">7</button>
-            <button onclick="appendToDisplay('8')">8</button>
-            <button onclick="appendToDisplay('9')">9</button>
-            <button onclick="appendToDisplay('*')" class="op-btn">*</button>
-            <button onclick="appendToDisplay('4')">4</button>
-            <button onclick="appendToDisplay('5')">5</button>
-            <button onclick="appendToDisplay('6')">6</button>
-            <button onclick="appendToDisplay('-')" class="op-btn">-</button>
-            <button onclick="appendToDisplay('1')">1</button>
-            <button onclick="appendToDisplay('2')">2</button>
-            <button onclick="appendToDisplay('3')">3</button>
-            <button onclick="appendToDisplay('+')" class="op-btn">+</button>
-            <button onclick="appendToDisplay('.')">.</button>
-            <button onclick="appendToDisplay('0')">0</button>
-            <button onclick="calculate('7')">=</button>
-            <button onclick="clearDisplay('7')" class="op-btn">C</button>
+
+    <div class="calculator">
+        <div class="display">
+            <div class="history" id="history"></div>
+            <div class="current-input" id="display">0</div>
+        </div>
+        
+        <div class="buttons">
+            <!-- Baris Fungsi Ilmiah -->
+            <button class="btn-sci" onclick="appendFunction('sin(')">sin</button>
+            <button class="btn-sci" onclick="appendFunction('cos(')">cos</button>
+            <button class="btn-sci" onclick="appendFunction('tan(')">tan</button>
+            <button class="btn-sci" onclick="appendCharacter('π')">π</button>
+            
+            <button class="btn-sci" onclick="appendFunction('log(')">log</button>
+            <button class="btn-sci" onclick="appendFunction('ln(')">ln</button>
+            <button class="btn-sci" onclick="appendFunction('sqrt(')">√</button>
+            <button class="btn-sci" onclick="appendCharacter('^')">^</button>
+
+            <button class="btn-sci" onclick="appendCharacter('(')">(</button>
+            <button class="btn-sci" onclick="appendCharacter(')')">)</button>
+            <button class="btn-sci" onclick="appendCharacter('e')">e</button>
+            <button class="btn-sci btn-del" onclick="deleteLast()">DEL</button>
+
+            <!-- Tombol Utama -->
+            <button class="btn-ac" onclick="clearDisplay()">AC</button>
+            <button class="btn-op" onclick="appendCharacter('%')">%</button>
+            <button class="btn-op" onclick="appendCharacter('/')">÷</button>
+            <button class="btn-op" onclick="appendCharacter('*')">×</button>
+
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button class="btn-op" onclick="appendCharacter('-')">−</button>
+
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button class="btn-op" onclick="appendCharacter('+')">+</button>
+
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            
+            <button class="btn-eq" onclick="calculateResult()">=</button>
+
+            <button onclick="appendNumber('0')" style="grid-column: span 2; border-radius: 12px;">0</button>
+            <button onclick="appendCharacter('.')">.</button>
         </div>
     </div>
-    <script src="script.js">
-    </script>
+
+    <!-- Menghubungkan JS Eksternal -->
+    <script src="script.js"></script>
 </body>
 </html>
