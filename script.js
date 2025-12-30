@@ -1,142 +1,157 @@
-/* --- Reset & Variabel CSS --- */
-:root {
-    --bg-color: #121212;
-    --calc-bg: #1e1e1e;
-    --display-bg: #262626;
-    --text-main: #e0e0e0;
-    --text-dim: #858585;
-    --accent-cyan: #00bcd4;
-    --accent-green: #4caf50;
-    --btn-bg: #2d2d2d;
-    --btn-hover: #383838;
-    --btn-active: #454545;
-    --btn-op-bg: #333333;
-    --shadow: 0 10px 30px rgba(0,0,0,0.5);
+// Mengambil elemen tampilan
+const displayElement = document.getElementById('display');
+const historyElement = document.getElementById('history');
+
+let currentExpression = "";
+let isResultDisplayed = false;
+
+// Fungsi memperbarui tampilan layar
+function updateDisplay() {
+    if (currentExpression === "") {
+        displayElement.innerText = "0";
+    } else {
+        // Mengganti operator JS dengan simbol visual
+        let visualExpression = currentExpression
+            .replace(/\*/g, '×')
+            .replace(/\//g, '÷')
+            .replace(/sqrt\(/g, '√(')
+            .replace(/Math.PI/g, 'π')
+            .replace(/Math.E/g, 'e');
+        displayElement.innerText = visualExpression;
+    }
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
+// Menambahkan angka ke ekspresi
+function appendNumber(number) {
+    if (isResultDisplayed) {
+        currentExpression = number;
+        isResultDisplayed = false;
+        historyElement.innerText = "";
+    } else {
+        currentExpression += number;
+    }
+    updateDisplay();
 }
 
-body {
-    font-family: 'JetBrains Mono', monospace;
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+// Menambahkan karakter/operator
+function appendCharacter(char) {
+    if (isResultDisplayed) {
+        isResultDisplayed = false;
+    }
+    
+    const ops = ['+', '-', '*', '/', '^', '%', '.'];
+    const lastChar = currentExpression.slice(-1);
+
+    if (ops.includes(char)) {
+        if (ops.includes(lastChar)) {
+            if (char === lastChar) {
+                return; 
+            }
+            // Izinkan tanda negatif setelah kali/bagi/pangkat
+            if (char === '-' && ['*', '/', '^'].includes(lastChar)) {
+                 currentExpression += char;
+            } 
+            else {
+                // Ganti operator jika tidak valid
+                const secondLastChar = currentExpression.slice(-2, -1);
+                if (ops.includes(secondLastChar)) {
+                    currentExpression = currentExpression.slice(0, -2) + char;
+                } else {
+                    currentExpression = currentExpression.slice(0, -1) + char;
+                }
+            }
+        } else {
+            currentExpression += char;
+        }
+    } else {
+        currentExpression += char;
+    }
+    updateDisplay();
 }
 
-.calculator {
-    background-color: var(--calc-bg);
-    width: 100%;
-    max-width: 380px;
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #333;
+// Menambahkan fungsi matematika
+function appendFunction(funcName) {
+    if (isResultDisplayed) {
+        currentExpression = "";
+        isResultDisplayed = false;
+        historyElement.innerText = "";
+    }
+    currentExpression += funcName;
+    updateDisplay();
 }
 
-.display {
-    background-color: var(--display-bg);
-    padding: 30px 20px;
-    text-align: right;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    min-height: 140px;
-    word-wrap: break-word;
-    word-break: break-all;
+// Menghapus semua (AC)
+function clearDisplay() {
+    currentExpression = "";
+    historyElement.innerText = "";
+    isResultDisplayed = false;
+    updateDisplay();
 }
 
-.history {
-    color: var(--text-dim);
-    font-size: 0.9rem;
-    min-height: 1.2em;
-    margin-bottom: 8px;
-    opacity: 0.8;
+// Menghapus satu karakter (DEL)
+function deleteLast() {
+    if (isResultDisplayed) {
+        clearDisplay();
+    } else {
+        if (currentExpression.endsWith('sin(') || currentExpression.endsWith('cos(') || 
+            currentExpression.endsWith('tan(') || currentExpression.endsWith('log(')) {
+            currentExpression = currentExpression.slice(0, -4);
+        } else if (currentExpression.endsWith('ln(')) {
+            currentExpression = currentExpression.slice(0, -3);
+        } else if (currentExpression.endsWith('sqrt(')) {
+            currentExpression = currentExpression.slice(0, -5);
+        } else {
+            currentExpression = currentExpression.slice(0, -1);
+        }
+        updateDisplay();
+    }
 }
 
-.current-input {
-    color: var(--text-main);
-    font-size: 2.2rem;
-    font-weight: 700;
-    letter-spacing: -1px;
-}
+// Logika Utama Perhitungan
+function calculateResult() {
+    try {
+        if (currentExpression === "") return;
 
-.buttons {
-    padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-}
+        let visualHistory = currentExpression
+            .replace(/\*/g, '×')
+            .replace(/\//g, '÷');
+        historyElement.innerText = visualHistory + " =";
 
-button {
-    font-family: 'JetBrains Mono', monospace;
-    background-color: var(--btn-bg);
-    color: var(--text-main);
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    height: 60px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
+        let evalString = currentExpression;
 
-button:hover {
-    background-color: var(--btn-hover);
-    transform: translateY(-2px);
-}
+        evalString = evalString.replace(/×/g, '*');
+        evalString = evalString.replace(/÷/g, '/');
+        
+        evalString = evalString.replace(/π/g, 'Math.PI');
+        evalString = evalString.replace(/e/g, 'Math.E');
+        
+        evalString = evalString.replace(/sin\(/g, 'Math.sin(');
+        evalString = evalString.replace(/cos\(/g, 'Math.cos(');
+        evalString = evalString.replace(/tan\(/g, 'Math.tan(');
+        evalString = evalString.replace(/log\(/g, 'Math.log10(');
+        evalString = evalString.replace(/ln\(/g, 'Math.log(');
+        evalString = evalString.replace(/sqrt\(/g, 'Math.sqrt(');
 
-button:active {
-    background-color: var(--btn-active);
-    transform: translateY(1px);
-}
+        evalString = evalString.replace(/\^/g, '**');
 
-.btn-sci {
-    color: var(--accent-cyan);
-    font-size: 0.9rem;
-    background-color: var(--btn-op-bg);
-    font-weight: bold;
-}
+        const result = new Function('return ' + evalString)();
 
-.btn-op {
-    color: var(--accent-cyan);
-    font-weight: bold;
-    font-size: 1.3rem;
-}
+        let finalResult = result;
+        if (!Number.isInteger(result)) {
+            finalResult = parseFloat(result.toFixed(8));
+        }
 
-.btn-ac {
-    color: #ff5252;
-    font-weight: bold;
-}
+        if (isNaN(finalResult) || !isFinite(finalResult)) {
+            displayElement.innerText = "Error";
+        } else {
+            displayElement.innerText = finalResult;
+            currentExpression = finalResult.toString();
+        }
+        
+        isResultDisplayed = true;
 
-.btn-del {
-    color: #ffab40;
-}
-
-.btn-eq {
-    background-color: var(--accent-cyan);
-    color: #121212;
-    font-weight: 900;
-    font-size: 1.5rem;
-    grid-column: span 1;
-}
-
-.btn-eq:hover {
-    background-color: #00acc1;
-}
-
-@media (max-width: 350px) {
-    .current-input { font-size: 1.8rem; }
-    button { height: 50px; font-size: 1rem; }
+    } catch (error) {
+        displayElement.innerText = "Error";
+        isResultDisplayed = true; 
+    }
 }
